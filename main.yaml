@@ -1,0 +1,7 @@
+---
+- name: Install gitlab on host using docker
+  hosts: target
+  gather_facts: no
+  roles:
+    - role: docker_init
+    - role: gitlab_install

@@ -1,0 +1,38 @@
+---
+# tasks file for gitlab_install
+
+- name: Create gitlab directories
+  file: path={{ item }} recurse=yes state=directory
+  with_items:
+    - "{{ gitlab_config_dir }}"
+    - "{{ gitlab_logs_dir }}"
+    - "{{ gitlab_data_dir }}"
+
+- name: Install Gitlab container
+  community.docker.docker_container:
+    name: gitlab
+    image: "{{ gitlab_image }}"
+    state: started
+    ports:
+      - "{{ gitlab_ssh_port }}:22"
+      - "{{ gitlab_http_port }}:80"
+      - "{{ gitlab_https_port }}:443"
+    volumes:
+      - "{{ gitlab_config_dir }}:/etc/gitlab"
+      - "{{ gitlab_logs_dir }}:/var/log/gitlab"
+      - "{{ gitlab_data_dir }}:/var/opt/gitlab"
+    restart_policy: always
+    shm_size: 256m
+
+- name: Wait for Gitlab installation completed
+  wait_for:
+    port: 80
+    delay: 20
+
+- name: Get Gitlab instance root passwd
+  command: docker exec -it gitlab grep 'Password:' /etc/gitlab/initial_root_password
+  register: root_passwd
+
+- name: Print Gitlab instance root passwd
+  debug:
+    var: root_passwd

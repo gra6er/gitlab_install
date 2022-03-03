@@ -1,0 +1,35 @@
+all:
+  hosts:
+    target:
+      ansible_host: <db host IP or DNS>
+      ansible_user: <sudo user>
+      ansible_password: <sudo user's password>
+      ansible_become: yes
+      ansible_become_password: <sudo user's password>
+  
+  vars:
+  # Gitlab image
+    gitlab_image: gitlab/gitlab-ce:latest
+
+  # Gitlab dirs
+    gitlab_home_dir: /opt/gitlab
+    gitlab_config_dir: '{{ gitlab_home_dir }}/config'
+    gitlab_logs_dir: '{{ gitlab_home_dir }}/logs'
+    gitlab_data_dir: '{{ gitlab_home_dir }}/data'
+
+  # Gitlab ports
+    gitlab_ssh_port: 2222
+    gitlab_http_port: 80
+    gitlab_https_port: 443
+
+  # DNF packages to prepare host  
+    dnf_packages:
+      - dnf-utils
+      - python3-pip
+      - unzip
+      - git
+      - docker-ce
+
+  # PIP packages to prepare host
+    pip_packages:
+      - docker-py
